@@ -1,0 +1,52 @@
+-- Demo data with fixed ids (used by the test suite and examples).
+-- Runs as the migration superuser, which bypasses RLS.
+--
+--   Acme   : alice (owner), bob (member), carol (viewer), erin (admin)
+--   Globex : dave  (owner), erin (member)
+--
+-- erin belongs to BOTH tenants, which is what makes the tenant switcher and
+-- "wrong tenant header" tests interesting.
+
+INSERT INTO app.tenants (id, slug, name, plan) VALUES
+  ('10000000-0000-7000-8000-000000000001', 'acme',   'Acme Corp',  'pro'),
+  ('10000000-0000-7000-8000-000000000002', 'globex', 'Globex Inc', 'free');
+
+INSERT INTO app.users (id, email, display_name) VALUES
+  ('20000000-0000-7000-8000-000000000001', 'alice@acme.test',   'Alice'),
+  ('20000000-0000-7000-8000-000000000002', 'bob@acme.test',     'Bob'),
+  ('20000000-0000-7000-8000-000000000003', 'carol@acme.test',   'Carol'),
+  ('20000000-0000-7000-8000-000000000004', 'dave@globex.test',  'Dave'),
+  ('20000000-0000-7000-8000-000000000005', 'erin@consult.test', 'Erin');
+
+INSERT INTO app.tenant_memberships (tenant_id, user_id, role) VALUES
+  ('10000000-0000-7000-8000-000000000001', '20000000-0000-7000-8000-000000000001', 'owner'),
+  ('10000000-0000-7000-8000-000000000001', '20000000-0000-7000-8000-000000000002', 'member'),
+  ('10000000-0000-7000-8000-000000000001', '20000000-0000-7000-8000-000000000003', 'viewer'),
+  ('10000000-0000-7000-8000-000000000001', '20000000-0000-7000-8000-000000000005', 'admin'),
+  ('10000000-0000-7000-8000-000000000002', '20000000-0000-7000-8000-000000000004', 'owner'),
+  ('10000000-0000-7000-8000-000000000002', '20000000-0000-7000-8000-000000000005', 'member');
+
+INSERT INTO app.projects (tenant_id, id, key, name, created_by) VALUES
+  ('10000000-0000-7000-8000-000000000001', '30000000-0000-7000-8000-000000000001', 'WEB', 'Website relaunch', '20000000-0000-7000-8000-000000000001'),
+  ('10000000-0000-7000-8000-000000000001', '30000000-0000-7000-8000-000000000002', 'OPS', 'Operations',       '20000000-0000-7000-8000-000000000001'),
+  ('10000000-0000-7000-8000-000000000002', '30000000-0000-7000-8000-000000000003', 'RND', 'Research',         '20000000-0000-7000-8000-000000000004');
+
+INSERT INTO app.tasks (tenant_id, id, project_id, title, description, status, priority, assignee_id, created_by, due_date) VALUES
+  ('10000000-0000-7000-8000-000000000001', '40000000-0000-7000-8000-000000000001', '30000000-0000-7000-8000-000000000001',
+   'Design new landing page', 'Hero section, pricing table and signup form', 'in_progress', 1,
+   '20000000-0000-7000-8000-000000000002', '20000000-0000-7000-8000-000000000001', current_date + 7),
+  ('10000000-0000-7000-8000-000000000001', '40000000-0000-7000-8000-000000000002', '30000000-0000-7000-8000-000000000001',
+   'Migrate blog to new CMS', NULL, 'todo', 2,
+   '20000000-0000-7000-8000-000000000002', '20000000-0000-7000-8000-000000000001', current_date - 2),
+  ('10000000-0000-7000-8000-000000000001', '40000000-0000-7000-8000-000000000003', '30000000-0000-7000-8000-000000000002',
+   'Rotate database credentials', 'Quarterly rotation for all environments', 'done', 0,
+   '20000000-0000-7000-8000-000000000005', '20000000-0000-7000-8000-000000000001', NULL),
+  ('10000000-0000-7000-8000-000000000002', '40000000-0000-7000-8000-000000000004', '30000000-0000-7000-8000-000000000003',
+   'Secret prototype pricing model', 'Confidential: Globex pricing strategy', 'todo', 1,
+   '20000000-0000-7000-8000-000000000004', '20000000-0000-7000-8000-000000000004', current_date + 30);
+
+INSERT INTO app.task_comments (tenant_id, id, task_id, author_id, body) VALUES
+  ('10000000-0000-7000-8000-000000000001', '50000000-0000-7000-8000-000000000001', '40000000-0000-7000-8000-000000000001',
+   '20000000-0000-7000-8000-000000000002', 'First draft is in Figma.'),
+  ('10000000-0000-7000-8000-000000000002', '50000000-0000-7000-8000-000000000002', '40000000-0000-7000-8000-000000000004',
+   '20000000-0000-7000-8000-000000000004', 'Do not share outside Globex.');

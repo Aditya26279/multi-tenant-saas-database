@@ -1,0 +1,27 @@
+{
+  "name": "multi-tenant-saas-database",
+  "version": "1.0.0",
+  "description": "Production-grade multi-tenant PostgreSQL schema: tenant isolation with row-level security, composite tenant keys, and a tenant-aware indexing strategy.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:reset": "node scripts/migrate.mjs --reset --seed",
+    "test": "node scripts/migrate.mjs --reset --seed && node --test --test-concurrency=1 \"test/*.test.mjs\"",
+    "bench": "node scripts/bench.mjs",
+    "demo": "node examples/demo.mjs",
+    "embedded": "node scripts/embedded-pg.mjs",
+    "test:embedded": "node scripts/embedded-pg.mjs \"npm test\"",
+    "bench:embedded": "node scripts/embedded-pg.mjs \"npm run db:reset && npm run bench\"",
+    "demo:embedded": "node scripts/embedded-pg.mjs \"npm run db:reset && npm run demo\""
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "embedded-postgres": "^18.4.0-beta.17"
+  }
+}
